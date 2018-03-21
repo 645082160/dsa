@@ -61,6 +61,15 @@ void print()
 	return;
 }
 
+void back()
+{
+	node tmp1 = path.back();
+	visit[tmp1.x][tmp1.y] = 0;
+	path.pop_back();
+	//cout << "pop4 " << "(" << tmp1.x<< ", " << tmp1.y << ")" << endl;
+	return;
+}
+
 //如何记录迷宫路径
 //如何判断是否找到了合适的路径
 //如何构造下一个分支
@@ -71,11 +80,6 @@ void backtrace(int x, int y)
 	if(x == ex && y == ey)
 	{
 		print();
-		//最后一个 节点，不需要尝试其任何方向，直接回退
-		node tmp1 = path.back();
-		visit[tmp1.x][tmp1.y] = 0;
-		path.pop_back();
-		//cout << "pop3 " << "(" << tmp1.x<< ", " << tmp1.y << ")" << endl;
 		return;
 	}
 
@@ -99,17 +103,11 @@ void backtrace(int x, int y)
 			//cout << "push " << "(" << m << ", " << n << ")" << endl;
 			//进入下一层分支继续试探
 			backtrace(m, n);
+			back();
 		}
 		
 	}
 
-	
-	//当前节点四个方向都尝试完毕，回退到上一个节点
-	node tmp1 = path.back();
-	visit[tmp1.x][tmp1.y] = 0;
-	path.pop_back();
-	//cout << "pop2 " << "(" << tmp1.x<< ", " << tmp1.y << ")" << endl;
-	
 	return;
 }
 
