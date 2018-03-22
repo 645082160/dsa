@@ -5,10 +5,10 @@ using std::cout;
 using std::list;
 
 const int ELEM_NUM = 3;
-
+const int M = 2;
 void print(int* res)
 {
-	for(int i = 0; i < ELEM_NUM; ++i)
+	for(int i = 0; i < M; ++i)
 	{
 		cout << res[i] << " ";
 	}
@@ -21,7 +21,7 @@ void print(int* res)
 void find(int pos, int* a, bool* visit, int* res)
 {
 	//µÝ¹é³ö¿Ú
-	if(pos >= ELEM_NUM)
+	if(pos >= M)
 	{
 		print(res);
 		return;
