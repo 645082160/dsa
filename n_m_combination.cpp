@@ -27,6 +27,7 @@ void find_combination(int step, int start, int* a, int* res)
 	}
 	//分支回溯
 	//这里没有执行回溯操作是因为传递参数的方式保证了
+	//这里是基于位置模型的算法实现模式
 	//从函数返回后，step和i都已经是原有的状态
 	for(int i = start; i < ELEM_SIZE; ++i)
 	{
