@@ -169,30 +169,46 @@ void PackageBranchAndBound::find_priorityq()
 		//获得优先级最大的元素，出队列，并作为扩展节点
 		e_node = nodeset.top();
 		nodeset.pop();
-
-		cout << "pop total p:" << e_node.total_p << ", weight:" << e_node.total_w << endl;
+		cout << "pop :(" << e_node.total_p << ", " << e_node.total_w << ", " << e_node.step << endl;
 		tmp_step = e_node.step + 1;
 		if(tmp_step >= m_n)
 		{
-			print(tmp_node);
-			return;
+			cout << "meet leaf:(" << e_node.total_p << ", " << e_node.total_w << ",";
+			list<int>::iterator it = e_node.container.begin();
+			list<int>::iterator end = e_node.container.end();
+			while(it != end)
+			{
+				cout << *it << " ";
+				++it;
+			}
+			cout << ")" << endl;
 			
+			/*
+			if(e_node.total_p > 0)
+			{
+				print(e_node);
+			}
+			*/
+			continue;
 		}
+		
 		//计算分支
 		if(m_c >= e_node.total_w + m_w[tmp_step])
 		{
 			tmp_node.step = tmp_step;
 			tmp_node.total_p = e_node.total_p + m_p[tmp_step];
 			tmp_node.total_w = e_node.total_w + m_w[tmp_step];
+			
+			tmp_node.container.clear();
+			tmp_node.container = e_node.container;
 			tmp_node.container.push_back(tmp_step);
+			
+			nodeset.push(tmp_node);
 		}
 
 		//计算出不放入的物品的情况 
-		if(m_c >= e_node.total_w)
-		{
-			++e_node.step;
-			nodeset.push(e_node);
-		}
+		++e_node.step;
+		nodeset.push(e_node);
 	}
 	
 }
