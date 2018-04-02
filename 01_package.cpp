@@ -154,7 +154,8 @@ void PackageBackTrack::find(int pos)
 		return;
 	}
 	//搜索+回溯
-	//分支搜索，回溯
+	//分支搜索，回溯，这种搜索方法时间复杂度是指数级的，n>10的时候，搜索
+	//速度就已经无法接受了====>真的是这样的么?实际测试下。
 	/*
 		2分法，一个物品放还是不放
 		这里只有限制条件，没有限界条件，01背包问题想要快速解决，则需要有
@@ -219,8 +220,163 @@ void PackageBackTrack::copy_from()
 	}
 	return;
 }
+
+class PackageDP
+{
+public:
+	bool init();//初始化输入
+	void dp();//执行DP，找到最大的背包价值
+	void print();//打印最大价值
+private:
+	int max(int p1, int p2);
+private:
+	int* m_w;//每个物品的重量数组
+	int* m_v;//每个物品的价值数组
+	int m_max_value;//最大价值
+	int m_c;//背包的最大容量
+	int m_n;//物品总个数
+	int** m_cache;//记录中间结果的数组
+};
+
+bool PackageDP::init()
+{
+	//输入背包最大容量
+	cout << "input max package volumn:";
+	cin >> m_c;
+	if(m_c <= 0)
+	{
+		cout << "package volumn error." << endl;
+		return false;
+	}
+
+	//输入物品个数
+	cout << "input objects num:";
+	cin >> m_n;
+	if(m_n <= 0)
+	{
+		cout << "objects number error." << endl;
+		return false;
+	}
+
+	m_w = new int[m_n]();
+	//输入 每个物品的体积
+	for(int i = 0; i < m_n; ++i)
+	{
+		cout << "input the " << i << " obj volumn:";
+		cin >> m_w[i];
+		if(m_w[i] <= 0)
+		{
+			cout << "obj volumn error." << endl;
+			return false;
+		}
+	}
+	
+	m_v = new int[m_n]();
+	//输入每个物品的价值
+	for(int i = 0; i < m_n; ++i)
+	{
+		cout << "input the " << i << " obj value:";
+		cin >> m_v[i];
+		if(m_v[i] <= 0)
+		{
+			cout << "obj value error." << endl;
+			return false;
+		}
+	}
+
+	//初始化cache数组 ，注意，因为添加了为0的情况，因此，数组
+	//记录的值的个数比物品个数和容量数量都大1个。
+	//这里的下标与物品数组和价值数组之间的下标对应要注意。
+	m_cache = new int* [m_n+1]();
+	for(int i = 0; i <= m_n; ++i)
+	{
+		m_cache[i] = new int[m_c + 1];
+	}
+	
+	return true;
+}
+
+void PackageDP::dp()
+{
+	//初始化，物品个数为0时，最大价值为0
+	for(int i = 0; i <= m_c; ++i)
+	{
+		m_cache[0][i] = 0;
+	}
+
+	//容量为0的背包，最大价值也是0
+	for(int i = 0; i <= m_n; ++i)
+	{
+		m_cache[i][0] = 0;
+	}
+
+	/*
+		对于物品规模为n，计算背包容量从1到m_c的最大价值
+	*/
+	for(int i = 1; i <= m_n; ++i)
+	{
+		for(int j = 1; j <= m_c; ++j)
+		{
+			 /*
+			 	容量为j时，
+			 	装不下第i个物品,则最大价值等于i-1个物
+			 	品装入容量为j的背包时的最大价值
+			 */
+			if(j < m_w[i - 1])
+			{
+				m_cache[i][j] = m_cache[i-1][j];
+			}
+			else
+			{
+				/*
+					背包容量为j的背包可以装下第i个物品，此时的计算法方式为:
+						看不装第i个物品时前i-1个物品装进容量为j的背包得到的价值更大，
+						还是装下第i个物品后，容量为j的背包得到的价值更大
+				*/
+				m_cache[i][j] = max(m_cache[i-1][j],  m_cache[i-1][j - m_w[i - 1]] + m_v[i - 1]);
+			}
+		}
+	}
+	return;
+}
+
+void PackageDP::print()
+{
+	cout << "max package value:" << m_cache[m_n][m_c] << endl;
+	//打印 出选择的物品列表
+	//根据DP的状态转移方程，逆向分析
+	int value = m_cache[m_n][m_c];
+	int i = m_n;//物品下标
+	int j = m_c;//背包容量
+	while(value > 0)
+	{
+		//判断是否选取了物品i
+		if(m_cache[i][j] != m_cache[i-1][j]) //是否是不选择物品i得到的值
+		{
+			//不相等的情况下，确认是选择了物品i
+			cout << "(" << i - 1 << ", " << m_w[i - 1] << ", " << m_v[i - 1] << ")" << endl;
+			j = j - m_w[i - 1];
+			--i;	
+		}
+		else
+		{
+			//相等的情况下，表示未选择物品i
+			--i;
+		}
+		value  = m_cache[i][j]; //为下次计算做准备
+	}
+	cout << endl;
+	return;
+}
+
+int PackageDP::max(int p1, int p2)
+{
+	return p1 > p2 ? p1 : p2;
+}
+
 int main(int argc, char** argv)
 {
+/*
 	int n = 0;
 	int* weights = NULL;
 	int* values = NULL;
@@ -262,6 +418,12 @@ int main(int argc, char** argv)
 	p.init();
 	p.find(0);
 	p.print();
-	
+*/
+	PackageDP dp;
+	if(dp.init())
+	{
+		dp.dp();
+		dp.print();
+	}
 	return 0;
 }
