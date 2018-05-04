@@ -161,7 +161,7 @@ void DFS(DG& g, int vex)
 	visit[vex] = true;
 
 	//遍历与该顶点相关联的顶点，执行深度优先访问
-	ArcNode* p = g.vex[vex].firstout;
+	ArcNode* p = g.vex[vex].firstout;//出边
 	int connected_vex = 0;
 	while(p != NULL)
 	{

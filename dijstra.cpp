@@ -12,6 +12,9 @@ const int MAX_PATH_LEN = 10000;//最短路径长度
 const int MAX_WEIGHT = 1000;//表示顶点之间无连接，边无穷大
 const int MAX_VEC_NUM = 100;
 
+/*
+使用邻接矩阵存储图
+*/
 class Graph
 {
 private:
@@ -28,7 +31,6 @@ public:
 	void print();//输出图
 	string findVexname(int index);
 	int locate(string& vexname); //输出顶点在数组中的位置
-	
 };
 
 int Graph::getEdge(int x, int y)
@@ -173,7 +175,7 @@ string Graph::findVexname(int index)
 	return m_vex[index];
 }
 
-//记录每个顶点离远点的最短距离及路径信息
+//记录每个顶点离原原点的最短距离及路径信息
 struct PathInfo
 {
 	int dis; //远点到当前顶点的最短距离
@@ -191,6 +193,7 @@ public:
 	void init(); //初始化路径信息
 	void createGraph(); //创建图 
 	bool minPath(string& vex); //计算最短路径信息
+	void find_path();
 	void print(); //打印最短路径信息
 };
 
@@ -288,6 +291,21 @@ bool Dijstra::minPath(string& vex)
 	return true;
 	
 }
+
+void Dijstra::find_path()
+{
+	string start, endl;
+	//输入起始点和结束点
+	cout << "input start and end vertex:";
+	cin >> start;
+	cin >> endl;
+	//初始化距离数组
+	int s_pos = locate(UDG & g, string data)
+
+	//执行状态转换
+	return;
+}
+
 
 void Dijstra::print()
 {

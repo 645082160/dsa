@@ -227,6 +227,11 @@ public:
 	bool init();//初始化输入
 	void dp();//执行DP，找到最大的背包价值
 	void print();//打印最大价值
+	void dp_memory_optimization();//优化cache存储的方式
+	void dp_full();//完全背包问题
+	void dp_full_print();//找到选择方案
+	void dp_full_op();// 完全背包问题优化
+	void dp_multi();//多重背包问题
 private:
 	int max(int p1, int p2);
 private:
@@ -236,6 +241,7 @@ private:
 	int m_c;//背包的最大容量
 	int m_n;//物品总个数
 	int** m_cache;//记录中间结果的数组
+	int* m_optimization;//内存优化后存储子问题的背包最优解
 };
 
 bool PackageDP::init()
@@ -292,6 +298,9 @@ bool PackageDP::init()
 	{
 		m_cache[i] = new int[m_c + 1];
 	}
+
+	//初始化优化内存存储
+	m_optimization = new int[m_c + 1]();
 	
 	return true;
 }
@@ -374,6 +383,123 @@ int PackageDP::max(int p1, int p2)
 	return p1 > p2 ? p1 : p2;
 }
 
+void PackageDP::dp_memory_optimization()
+{
+	for(int i = 1; i <= m_n; ++i)
+	{
+		for(int j = m_c; j>= m_w[i - 1]; --j) //第一次实现的时候，考虑了条件j > m_w[i - 1],导致j=m_w[i - 1]没有被处理，结果错误
+		{
+			//当j小于第i 个物品时，背包最优解不变
+			//当j大于第i个物品体积时，需要计算背包新的最优解
+			//大的j值要先更新，小的j值后更新，这样才能保证正确性
+			m_optimization[j] = max(m_optimization[j], m_optimization[j - m_w[i - 1]] + m_v[i - 1]);
+		}
+	}
+
+	cout << "max price:" << m_optimization[m_c] << endl;
+	return;
+}
+
+void PackageDP::dp_full()
+{
+	//初始化cache数组
+	for(int i = 0; i <= m_n; ++i)
+	{
+		m_cache[i][0] = 0;
+	}
+
+	for(int i = 0; i <= m_c; ++i)
+	{
+		m_cache[0][i] = 0;
+	}
+
+	//执行DP
+	int cnt = 0;
+	int tmp_cnt = 0;
+	int curr_max = 0;
+	int tmp_value = 0;
+	for(int i = 1; i <= m_n; ++i)
+	{
+		for(int j = 1; j <= m_c; ++j)
+		{
+			//连续放物品i，计算背包的最优值
+			cnt = j /m_w[i - 1]; //这里兼容了j < m_w[i - 1]这种情形
+			for(int k = 0; k <= cnt; ++k) //这里的边界值很重要，需要测试等于的情况，k=0时表示不放
+			{
+				tmp_value = m_cache[i - 1][j - k * m_w[i - 1]] + k * m_v[i - 1];
+				curr_max = max(curr_max, tmp_value);
+			}
+			
+			m_cache[i][j] = curr_max;
+			tmp_value = 0;
+			curr_max = 0;
+		}
+	}
+
+	cout << "max value:" << m_cache[m_n][m_c] << endl;
+	return;
+}
+
+
+
+void PackageDP::dp_full_print()
+{
+	int i = m_n;
+	int j = m_c;
+	int price = m_cache[i][j];
+	int cnt = 0;
+	while(price > 0)
+	{
+		cnt = j / m_w[i - 1];
+		for(int k = 0; k <= cnt; ++k)
+		{
+			if(price == m_cache[i - 1][j - k * m_w[i - 1]] + k * m_v[i - 1])
+			{
+				for(int m = 0; m < k; ++m)
+				{
+					cout << "(" << i - 1 << ", " << m_w[i - 1] << ", " << m_v[i - 1] << ")" << endl;
+				}
+				price = m_cache[i - 1][j - k * m_w[i - 1]];
+				--i;
+				j -= k * m_w[i - 1];
+				break;
+			}
+		}
+	}
+
+	cout << endl;
+	return;
+}
+void PackageDP::dp_full_op()
+{
+	int cnt = 0;
+	int curr_max = 0;
+	int tmp_value = 0;
+	for(int i = 1; i <= m_n; ++i)
+	{
+		for(int j = m_c; j - m_w[i - 1] >= 0; --j)
+		{
+			/*
+				关于临时变量的初始化，我觉得即使你在定义的时候初始化过，
+				在进入代码逻辑之前还是要再初始化一下，不要觉得麻烦，不这样做
+				的话，你可能面临在整个逻辑之后初始化这些变量的问题，你可能搞忘
+			*/
+			tmp_value = 0;
+			curr_max = 0;
+			cnt = j / m_w[i - 1];
+			for(int k = 0; k <= cnt; ++k)
+			{
+				tmp_value = m_optimization[j - k * m_w[i -1]] + k * m_v[i - 1];
+				curr_max = max(tmp_value, curr_max);
+			}
+			m_optimization[j] = curr_max;
+		}
+	}
+
+	cout << "max value:" << m_optimization[m_c] << endl;
+	
+	return;
+}
 int main(int argc, char** argv)
 {
 /*
@@ -425,5 +551,14 @@ int main(int argc, char** argv)
 		dp.dp();
 		dp.print();
 	}
+
+	dp.dp_memory_optimization();
+
+	cout << endl;
+	dp.dp_full();
+	dp.dp_full_print();
+
+	cout << endl;
+	dp.dp_full_op();
 	return 0;
 }
