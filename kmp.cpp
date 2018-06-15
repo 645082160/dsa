@@ -182,7 +182,7 @@ int kmp_v1(char T[],char P[])
         if (q == m)
         {
         	cout << "i: " << i << ", m: " << m << ", q:" << q << endl;
-            cout << "Pattern occurs with shift:" << (i-m+1) << endl; 
+         	cout << "Pattern occurs with shift:" << (i-m+1) << endl; 
         }
     }    
 	return 0;

@@ -103,13 +103,58 @@ void backtrace(int x, int y)
 			//cout << "push " << "(" << m << ", " << n << ")" << endl;
 			//进入下一层分支继续试探
 			backtrace(m, n);
-			back();
+			back(); 
 		}
 		
 	}
 
 	return;
 }
+
+//另外一种写法，与上面对比下。
+void backtrace_1(int x, int y)
+{
+	//当前节点入栈
+	node tmp = {x, y};
+	path.push_back(tmp);//将合法的节点加入队列
+	visit[x][y] = 1;
+
+	
+	//退出条件
+	if(x == ex && y == ey)
+	{
+		print();
+		//找到了路径，不需要再试探它的四个方向，执行回溯
+	}
+	else
+	{
+		//需要试探它的四个方向，试探完毕后回溯
+		int m = x;
+		int n = y;
+		//生成分支,每一个方向是一个分支
+		for(int i = 0; i < 4; ++i)
+		{
+			//计算下一个方向的坐标
+			m = x + dir[i][0];
+			n = y + dir[i][1];
+			//判断该点是否可通过
+			if(m >=0 && m < MAZE_SIZE 
+			&& n >= 0 && n < MAZE_SIZE
+			&& maze[m][n] == 0
+			&& visit[m][n] != 1)//可通过,尝试该节点的其他方向
+			{
+				//cout << "push " << "(" << m << ", " << n << ")" << endl;
+				//进入下一层分支继续试探
+				backtrace_1(m, n);
+			}	
+		}
+		//当前节点的4个方向都试探完毕，要想上层返回了，需要back
+	}
+	
+	back();
+	return;
+}
+
 
 int main(int argc, char** argv)
 {
@@ -118,5 +163,9 @@ int main(int argc, char** argv)
 	path.push_back(first);
 	visit[sx][sy] = 1;
 	backtrace(sx, sy);
+	/*
+	另外一种写法:这种写法，在递归返回的时候回溯，形式更统一
+	backtrace(sx, sy);
+	*/
 	return 0;
 }

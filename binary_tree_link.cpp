@@ -83,8 +83,10 @@ void preorder_iteration(node* tree)
 		}
 		else
 		{
+			//根节点出栈，访问右子树，此时需要循环处理
 			s.pop();
-		
+
+			 
 			while(true)
 			{
 				if(tmp->right != NULL)
@@ -104,6 +106,7 @@ void preorder_iteration(node* tree)
 					
 				}
 			}
+			
 		}
 	}
 
@@ -119,6 +122,10 @@ void preorder_iteration_v1(node* tree)
 		return;
 	}
 
+	/*
+		下面这段代码真的很有意思，通过简单的修改while条件，
+		就将沿着左子树往下，沿着右子树往下表现的非常到位
+	*/
 	stack<node*> s;
 	node* tmp = tree;
 	while(tmp != NULL || !s.empty())
@@ -266,13 +273,47 @@ void followup_iteration(node* tree)
 	//需要一个栈
 	stack<node_wrap*> s;
 
+
+	node* tmp = tree;
+	node_wrap* nw= NULL;
+	while(tmp != NULL || !s.empty())
+	{
+		if(tmp != NULL)
+		{ 
+			nw = new node_wrap();
+			nw->n = tmp ;
+			nw->time = 1
+			s.push(nw);
+			
+			tmp = tmp->left;
+		}
+		else
+		{
+			nw = s.top();
+			tmp = nw->n;
+			if(tmp->time == 2) //第二次出栈，访问
+			{
+				cout << tmp->value;
+				s.pop();
+				tmp = NULL;
+			}
+			else
+			{
+				++nw->time;
+				tmp = tmp->right;
+			}
+			
+		}
+	}
+	/*
 	node_wrap* nw = new node_wrap();
 	nw->n = tree;
-	nw->time = 1;
+	nw->time = 0;
 	//栈初始化
-	s.push(nw);
-
+	//s.push(nw);
 	node_wrap* tmp = NULL;
+	
+	
 	while(!s.empty())
 	{
 		tmp = s.top();
@@ -325,6 +366,7 @@ void followup_iteration(node* tree)
 			}
 		}
 	}	
+	*/
 
 	cout << endl;
 	return;

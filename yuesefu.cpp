@@ -30,7 +30,8 @@ void yuesefu(int n, int k, int m)
 	}
 
 	int count = 0; //自杀人数
-	for(int i = k - 1, j = 0;; ++i, i = i % n)
+	//从0开始编号，K表示从编号为k开始报数，编号从0开始
+	for(int i = k, j = 0;; ++i, i = i % n)
 	{
 		if(a[i])
 		{

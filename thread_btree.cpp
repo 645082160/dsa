@@ -58,13 +58,13 @@ void preorder_thread(bnode* root)
 		return;
 	}
 
-	if(root != NULL &&  pre != NULL && root->left == NULL && root->ltag == LINK)
+	if(pre != NULL && root->left == NULL && root->ltag == LINK)
 	{
 		root->left = pre;
 		root->ltag = THREAD;
 	}
 
-	if(pre != NULL && root != NULL && pre->right == NULL && pre->rtag == LINK)
+	if(pre != NULL && pre->right == NULL && pre->rtag == LINK)
 	{
 		pre->right = root;
 		pre->rtag = THREAD;
@@ -73,6 +73,7 @@ void preorder_thread(bnode* root)
 	pre = root;
 
 	 //线索化，修改了当前节点的左子树
+	 //只有在没有线索化时，才能继续遍历左子树
 	if(root->left != NULL && root->ltag == LINK)
 	{
 		preorder_thread(root->left);
@@ -90,7 +91,7 @@ void preorder_thread_visit(bnode* root)
 		return;
 	}
 
-	bnode* p = root;//计数器
+	bnode* p = root;//迭代器
 	while(p != NULL)
 	{
 		cout << p->value;
@@ -100,6 +101,7 @@ void preorder_thread_visit(bnode* root)
 		}
 		else
 		{
+			/*
 			while(p->right != NULL)
 			{
 				if(p->rtag == THREAD)
@@ -111,6 +113,13 @@ void preorder_thread_visit(bnode* root)
 				{
 					break;
 				}
+			}
+			*/
+			//沿着线索访问
+			while(p->right != NULL && p->rtag == THREAD)
+			{
+				p = p->right;
+				cout << p->value;
 			}
 			//先序遍历，某个节点的左子树和右子树都是没有访问过的
 			//因此，存在左子树的情况下，需要访问左子树
@@ -175,6 +184,7 @@ void inorder_thread_visit(bnode* root)
 		}
 
 		cout << p->value;
+		/*
 		while(p->right != NULL)
 		{
 			if(p->rtag == THREAD)
@@ -187,7 +197,17 @@ void inorder_thread_visit(bnode* root)
 				break;
 			}
 		}
+		*/
+		//沿着线索访问
+		while(p->right != NULL && p->rtag == THREAD)
+		{
+			p = p->right;
+			cout << p->value;
+		}
 
+		//这里为什么中序遍历时，直接访问了右子树呢?
+		//因为已经访问了根节点，此时应该访问右子树
+		//不访问左子树的原因是:左子树已经被访问过了
 		p = p->right;
 		
 	}
@@ -252,6 +272,8 @@ void postorder_thread(bnode* root)
 	return;
 }
 
+
+//这个是有问题的，胡须线索
 void postorder_thread_visit(bnode* root)
 {
 	if(root == NULL)
@@ -269,6 +291,7 @@ void postorder_thread_visit(bnode* root)
 
 		
 		cout << p->value;
+		/*
 		while(p->right != NULL)
 		{
 			if(p->rtag == THREAD)
@@ -280,6 +303,12 @@ void postorder_thread_visit(bnode* root)
 			{
 				break;
 			}
+		}
+		*/
+		while(p->right != NULL && p->rtag == THREAD)
+		{
+			p = p->right;
+			cout << p->value;
 		}
 		
 
